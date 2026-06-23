@@ -1,14 +1,17 @@
 name: check-replies
-# 라라스윗 운영 콘솔: 메일 답장 → 슬랙 알림. 5분마다 콘솔의 보호된 엔드포인트를 호출.
 on:
+  workflow_dispatch: {}
   schedule:
     - cron: "*/5 * * * *"
-  workflow_dispatch: {}
+permissions: {}
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: check replies
+      - name: ping check-replies
+        env:
+          SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS -X POST "https://lalasweet-console.vercel.app/api/cron/check-replies" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" -o /dev/null -w "HTTP %{http_code}\n"
+          code=$(curl -fsS -X POST "https://lalasweet-console.vercel.app/api/cron/check-replies" \
+            -H "Authorization: Bearer $SECRET" -o /dev/null -w "%{http_code}")
+          echo "HTTP $code"
