@@ -1,0 +1,22 @@
+name: track-views
+# 조회수 자동 트래킹(회사 PC Apify 대체) — 매일 KST 09:00, 트래킹 시트 릴스 조회수를 오늘 날짜열에 기록.
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 0 * * *"   # UTC 00:00 = KST 09:00
+permissions: {}
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --no-audit --no-fund
+      - name: track views
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          GOOGLE_SERVICE_ACCOUNT_EMAIL: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+        run: node scripts/track-views.mjs
